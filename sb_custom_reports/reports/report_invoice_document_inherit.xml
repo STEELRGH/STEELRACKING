@@ -196,11 +196,11 @@
                     <span t-else="" t-field="o.invoice_incoterm_id.code" class="m-0 h6"/>
                 </div>
 
-                <div t-attf-class="#{'col-auto col-3 mw-100' if report_type != 'html' else 'col'} mb-2" name="tasa_cambio">
+                <!-- <div t-attf-class="#{'col-auto col-3 mw-100' if report_type != 'html' else 'col'} mb-2" name="tasa_cambio">
                     <strong>Tasa de cambio:</strong>
                     <br/>
                     <span t-field="o.x_studio_tasa_de_cambio" class="m-0 h6"/>
-                </div>
+                </div> -->
             </div>
 
             <t t-set="display_discount" t-value="any(l.discount for l in o.invoice_line_ids)"/>
