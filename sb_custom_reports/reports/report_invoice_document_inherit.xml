@@ -171,10 +171,10 @@
                     <br/>
                     <span t-field="o.invoice_origin" class="m-0 h6">SO123</span>
                 </div>
-                <div t-attf-class="#{'col-auto col-3 mw-100' if report_type != 'html' else 'col'} mb-2" t-if="o.pos_refunded_invoice_ids" name="source_invoice">
+                <!-- <div t-attf-class="#{'col-auto col-3 mw-100' if report_type != 'html' else 'col'} mb-2" t-if="o.pos_refunded_invoice_ids" name="source_invoice">
                     <strong>Factura origen:</strong>
                     <p class="m-0 h6" t-field="o.pos_refunded_invoice_ids"/>
-                </div>
+                </div> -->
                 <div t-attf-class="#{'col-auto col-3 mw-100' if report_type != 'html' else 'col'} mb-2" t-if="o.partner_id.ref" name="customer_code">
                     <strong>Código cliente:</strong>
                     <br/>
