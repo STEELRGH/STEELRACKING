@@ -208,7 +208,6 @@
                 </table>
 
                 <!--Asientos contables relacionados del pago-->
-                <span t-field="o.move_type"/>
                 <h6 t-if="o.move_id.related_move_lines">Asientos contables relacionados al pago</h6>
                 <table name="move_related_payment" t-if="o.move_id.related_move_lines" class="table table-sm">
                     <t t-set="move_related" t-value="o.move_id.related_move_lines"/>
@@ -238,7 +237,7 @@
 
 
                 <!--Asientos contables tasa cambiaria-->
-                <h6 t-if="o.reversal_move_id">Asientos contables tasa cambiaria</h6>
+                <!-- <h6 t-if="o.reversal_move_id">Asientos contables tasa cambiaria</h6>
                 <table name="move_reversal" t-if="o.reversal_move_id" class="table table-sm">
                     <t t-set="move_reversal" t-value="o.reversal_move_id"/>
                     <thead>
@@ -262,10 +261,10 @@
                             </tr>
                         </t>
                     </tbody>
-                </table>
+                </table> -->
 
 
-                
+
 
                   <t t-if="cfdi">
                     <table class="table table-sm">
