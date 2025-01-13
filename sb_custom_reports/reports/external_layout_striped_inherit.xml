@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+   <!--STANDARD Layout-->
+   <!--Inherited the standard external layout for changing company address position-->
+   <template id="custom_external_layout_striped" inherit_id="web.external_layout_striped">
+       <!--report header-->
+       <xpath expr="//div[1]" position="replace">
+           <div t-attf-class="header o_company_#{company.id}_layout" t-att-style="report_header_style">
+               <!--Company Logo-->
+               <div class="row mb8">
+                   <div class="col-6">
+                        <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="max-height:70px;max-width:140%;padding-top:10px;" alt="Logo"/>
+                    </div>
+                    <div class="col-6 text-end">
+                    </div>
+               </div>
+               
+               <!--Header Border-->
+               <div t-if="company.logo or company.report_header" class="row zero_min_height">
+                   <div class="col-12">
+                       <div style="border-bottom: 2px solid #EAEAEA;"/>
+                   </div>
+               </div>
+           </div>
+        </xpath>
+       <!--report footer-->
+       <xpath expr="//div[@t-attf-class='o_company_#{company.id}_layout footer o_background_footer']" position="replace">
+           <div t-attf-class="o_company_#{company.id}_layout footer o_background_footer">
+               <div class="text-center" style="border-top: 2px solid black; border-bottom: 2px solid black;">
+                    <p class="text-uppercase" style="padding-top: 6px;" t-field="company.report_footer"/>
+                    <!-- <p class="text-uppercase" style="padding-top: 6px;"><b><t t-esc="company.street"/>, <t t-esc="company.l10n_mx_edi_colony"/>, C.P. <t t-esc="company.zip"/>, <t t-esc="company.l10n_mx_edi_locality_id.name"/>, <t t-esc="company.state_id.code"/>., RFC: <t t-esc="company.vat"/></b></p> -->
+                    <img t-att-src="'/sb_custom_reports/static/src/img/partners.jpg'" style="padding: 2px; margin-top:-20px;"/>
+               </div>
+           </div>
+       </xpath>
+   </template>
+</odoo>
