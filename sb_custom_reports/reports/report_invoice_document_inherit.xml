@@ -270,7 +270,7 @@
                                     </td>
 
                                     <td name="td_product_code" class="text-end" style="width:150px">
-                                        <span t-field="line.product_id.x_studio_no_parte" class="h6"/>
+                                        <span t-field="line.product_id.default_code" class="h6"/>
                                     </td>
                                     <td name="td_no_parte" class="text-end" style="width:150px">
                                         <span t-field="line.product_id.default_code" class="h6"/>
