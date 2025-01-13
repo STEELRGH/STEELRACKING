@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="custom_report_payment_receipt_document" inherit_id="account.report_payment_receipt_document">
+            <xpath expr="/t[@t-name='account.report_payment_receipt_document']" position="replace" mode="inner">
+              <t t-call="web.external_layout">
+                <t t-set="o" t-value="o.with_context(lang=lang)"/>
+                <t t-set="values" t-value="o._get_payment_receipt_report_values()"/>
+
+                <div class="mt-5 clearfix">
+                <div class="page mb-4">
+                  <h3 class="text-end o_underline">
+                    <strong id="payment_title">Recibo de pago: <span t-field="o.name"/></strong>
+                  </h3>
+                  
+                  <div class="mb-4 mt-3">
+                    <div name="date" class="row">
+                      <div class="col-6" t-if="o.date">
+                        Fecha de pago: <span t-field="o.date" style="font-weight: bolder;">2023-01-01</span>
+                      </div>
+
+                      <div t-if="cfdi and o.l10n_mx_edi_payment_method_id" class="col-6">
+                        <strong>Forma de Pago CFDI:</strong>
+                        <span t-out="'%s - %s' % (o.l10n_mx_edi_payment_method_id.code, o.l10n_mx_edi_payment_method_id.name)"/>
+                      </div>
+                    </div>
+                    <t t-set="cfdi" t-value="values.get('cfdi')"/>
+                    <div t-if="cfdi and o.company_id.vat != cfdi['supplier_rfc']" class="col-6">
+                      XML VAT:<span t-out="cfdi['supplier_rfc']"/>
+                    </div>
+                    
+                    <div class="oe_structure"/>
+                    <div class="row">
+                      <div class="col-6" t-if="o.partner_type">
+                        <t t-if="o.partner_type == 'customer'">
+                                          Cliente:
+                                      </t>
+                        <t t-else="o.partner_type == 'supplier'">
+                                          Proveedor:
+                                      </t>
+                        <span t-field="o.partner_id">Marc Demo</span>
+                      </div>
+                      <div name="payment_method" t-if="values['display_payment_method'] and o.payment_method_id" class="col-6">
+                        Método de pago: <span t-field="o.payment_method_id.name">Credit card</span>
+                      </div>
+                    </div>
+                    <div class="oe_structure"/>
+                    <div class="row">
+                      <div class="col-6" t-if="o.amount">
+                        Monto pago: <span t-field="o.amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}">50 USD</span>
+                      </div>
+                      <div class="col-6" t-if="o.ref">
+                        Memo: <span t-field="o.ref">Sample Memo</span>
+                      </div>
+                    </div>
+                    <div class="row" t-if="is_cfdi_signed and o.partner_id.l10n_mx_edi_fiscal_regime">
+                      <div class="col-6">
+                        Régimen fiscal: (<span t-out="o.partner_id.l10n_mx_edi_fiscal_regime"/>) <span t-field="o.partner_id.l10n_mx_edi_fiscal_regime"/>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="oe_structure"/>
+                  <t t-if="cdfi and cfdi['cfdi_node']">
+                    <t t-set="payment_info" t-value="cfdi.get('payment_info')"/>
+                    <table class="table table-sm" t-if="payment_info">
+                      <thead>
+                        <tr>
+                          <th t-if="payment_info['from_account_vat']">
+                            <t t-out="o.company_id.account_fiscal_country_id.vat_label or 'VAT'"/>
+                            <span> Emitter Acc. Ord.</span>
+                          </th>
+                          <th t-if="payment_info['from_account_name']">Bank Name Acc. Ord.</th>
+                          <th t-if="payment_info['from_account_number']">Account Ord.</th>
+                          <th t-if="payment_info['to_account_vat']">
+                            <t t-out="o.company_id.account_fiscal_country_id.vat_label or 'VAT'"/>
+                            <span> Emitter Acc. Ben.</span>
+                          </th>
+                          <th t-if="payment_info['to_account_number']">Account Ben.</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td t-if="payment_info['from_account_vat']">
+                            <span t-out="payment_info['from_account_vat']"/>
+                          </td>
+                          <td t-if="payment_info['from_account_name']">
+                            <span t-out="payment_info['from_account_name']"/>
+                          </td>
+                          <td t-if="payment_info['from_account_number']">
+                            <span t-out="payment_info['from_account_number']"/>
+                          </td>
+                          <td t-if="payment_info['to_account_vat']">
+                            <span t-out="payment_info['to_account_vat']"/>
+                          </td>
+                          <td t-if="payment_info['to_account_number']">
+                            <span t-out="payment_info['to_account_number']"/>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </t>
+                  <table name="invoices" t-if="values['display_invoices']" class="table table-sm">
+                    <t t-set="partials" t-value="o.move_id._get_reconciled_invoices_partials()[0]"/>
+                    <t t-set="invoices" t-value="{partial[2].move_id for partial in partials}"/>
+                    <t t-foreach="invoices" t-as="inv">
+                      <t t-if="any(inv.currency_id != par[2].currency_id for par in inv._get_reconciled_invoices_partials()[0])" t-set="otherCurrency" t-value="True"/>
+                    </t>
+                    <thead>
+                      <tr>
+                        <th>
+                          <span>Fecha de la Factura</span>
+                        </th>
+                        <th>
+                          <span>Número de Factura</span>
+                        </th>
+                        <th>
+                          <span>Referencia</span>
+                        </th>
+                        <th t-if="otherCurrency" class="text-end">
+                          <span>Amount In Currency</span>
+                        </th>
+                        <th class="text-end">
+                          <span>Monto</span>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <t t-foreach="invoices" t-as="inv">
+                        <t t-if="inv.move_type != 'entry'">
+                          <tr>
+                            <td>
+                              <span t-field="inv.invoice_date">2023-01-01</span>
+                            </td>
+                            <td>
+                              <span t-field="inv.name">INV001</span>
+                            </td>
+                            <td>
+                              <span t-field="inv.ref">Sample Ref</span>
+                            </td>
+                            <td t-if="otherCurrency"/>
+                            <td class="text-end">
+                              <span t-field="inv.amount_total">100.00 USD</span>
+                            </td>
+                          </tr>
+                          <tr t-foreach="inv._get_reconciled_invoices_partials()[0]" t-as="par">
+                            <t t-set="payment" t-value="par[2].move_id"/>
+                            <td>
+                              <span t-field="payment.date">2023-01-05</span>
+                            </td>
+                            <td>
+                              <span t-field="payment.name">PAY001</span>
+                            </td>
+                            <td>
+                              <span t-field="payment.ref">Payment Ref</span>
+                            </td>
+                            <t t-set="amountPayment" t-value="-payment.amount_total"/>
+                            <t t-set="amountInvoice" t-value="-par[1]"/>
+                            <t t-set="currencyPayment" t-value="payment.currency_id"/>
+                            <t t-set="currencyInvoice" t-value="inv.currency_id"/>
+                            <td t-if="otherCurrency" class="text-end">
+                              <span t-if="currencyPayment != currencyInvoice" t-out="amountPayment" t-options="{'widget': 'monetary', 'display_currency': currencyPayment}">50.00 EUR</span>
+                            </td>
+                            <td class="text-end">
+                              <span t-out="amountInvoice" t-options="{'widget': 'monetary', 'display_currency': currencyInvoice}">25.00 USD</span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td/>
+                            <td>
+                              <strong>Due Amount for <span t-field="inv.name">INV001</span>
+                              </strong>
+                            </td>
+                            <td/>
+                            <td t-if="otherCurrency"/>
+                            <td class="text-end">
+                              <strong>
+                                <span t-field="inv.amount_residual">25.0 USD</span>
+                              </strong>
+                            </td>
+                          </tr>
+                        </t>
+                      </t>
+                    </tbody>
+                  </table>
+
+
+                  <!--Asientos contables del pago-->
+                <h5 t-if="o.move_id">Asientos contables del pago</h5>
+                <table name="move_payment" t-if="o.move_id" class="table table-sm">
+                    <t t-set="payment" t-value="o.move_id.line_ids"/>
+                    <thead>
+                        <tr>
+                            <th><span>Cuenta</span></th>
+                            <th><span>Contacto</span></th>
+                            <th><span>Débito</span></th>
+                            <th><span>Crédito</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="payment" t-as="pay_move">
+                            <tr>
+                                <td><span t-field="pay_move.account_id.name">Nombre</span></td>
+                                <td><span t-field="pay_move.partner_id.name">INV001</span></td>
+                                <td><span t-field="pay_move.debit" t-options="{'widget': 'monetary', 'display_currency': currencyPayment}">50.00</span></td>
+                                <td class="text-end"><span t-field="pay_move.credit" t-options="{'widget': 'monetary', 'display_currency': currencyPayment}">100.00 USD</span></td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+
+                <!--Asientos contables relacionados del pago-->
+                <h6 t-if="o.move_id.related_move_lines">Asientos contables relacionados al pago</h6>
+                <table name="move_related_payment" t-if="o.move_id.related_move_lines" class="table table-sm">
+                    <t t-set="move_related" t-value="o.move_id.related_move_lines"/>
+                    <thead>
+                        <tr>
+                            <th><span>Cuenta</span></th>
+                            <th><span>Etiqueta</span></th>
+                            <th><span>Fecha</span></th>
+                            <th><span>Asiento contable</span></th>
+                            <th><span>Débito</span></th>
+                            <th><span>Crédito</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="move_related" t-as="pay_move_rel">
+                            <tr>
+                                <td><span t-field="pay_move_rel.account_id.name">Nombre</span></td>
+                                <td><span t-field="pay_move_rel.name">Nombre</span></td>
+                                <td><span t-field="pay_move_rel.date">18/12/2024</span></td>
+                                <td><span t-field="pay_move_rel.move_id.name">INV001</span></td>
+                                <td><span t-field="pay_move_rel.debit" t-options="{'widget': 'monetary', 'display_currency': currencyPayment}">50.00</span></td>
+                                <td class="text-end"><span t-field="pay_move_rel.credit" t-options="{'widget': 'monetary', 'display_currency': currencyPayment}">100.00 USD</span></td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+
+
+                <!--Asientos contables tasa cambiaria-->
+                <!-- <h6 t-if="o.reversal_move_id">Asientos contables tasa cambiaria</h6>
+                <table name="move_reversal" t-if="o.reversal_move_id" class="table table-sm">
+                    <t t-set="move_reversal" t-value="o.reversal_move_id"/>
+                    <thead>
+                        <tr>
+                            <th><span>Cuenta</span></th>
+                            <th><span>Contacto</span></th>
+                            <th><span>Etiqueta</span></th>
+                            <th><span>Débito</span></th>
+                            <th><span>Crédito</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="move_reversal" t-as="move_rev">
+                            <tr>
+                                <td><span t-field="move_rev.account_id.name">Nombre</span></td>
+                                <td><span t-field="move_rev.partner_id.name">Contacto</span></td>
+                                <td><span t-field="move_rev.name">Etiqueta</span></td>
+                                <td><span t-field="move_rev.move_id.name">INV001</span></td>
+                                <td><span t-field="move_rev.debit" t-options="{'widget': 'monetary', 'display_currency': currencyPayment}">50.00</span></td>
+                                <td class="text-end"><span t-field="move_rev.credit" t-options="{'widget': 'monetary', 'display_currency': currencyPayment}">100.00 USD</span></td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table> -->
+
+
+
+
+                  <t t-if="cfdi">
+                    <table class="table table-sm">
+                      <thead>
+                        <tr>
+                          <th>Factura</th>
+                          <th>UUID</th>
+                          <th class="text-end">Parcialidad</th>
+                          <th class="text-end">Saldo anterior</th>
+                          <th class="text-end">Monto Pagado</th>
+                          <th class="text-end">Saldo</th>
+                          <th>Moneda</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr t-foreach="cfdi['invoices']" t-as="inv_values">
+                          <td>
+                            <span t-out="inv_values['invoice'].name"/>
+                          </td>
+                          <td>
+                            <span t-out="inv_values['uuid']"/>
+                          </td>
+                          <td class="text-end">
+                            <span t-out="inv_values['partiality']"/>
+                          </td>
+                          <td class="text-end">
+                            <span t-out="inv_values['previous_balance']" t-options="{'widget': 'monetary', 'display_currency': inv_values['invoice'].currency_id}"/>
+                          </td>
+                          <td class="text-end">
+                            <span t-out="inv_values['amount_paid']" t-options="{'widget': 'monetary', 'display_currency': inv_values['invoice'].currency_id}"/>
+                          </td>
+                          <td class="text-end">
+                            <span t-out="inv_values['balance']" t-options="{'widget': 'monetary', 'display_currency': inv_values['invoice'].currency_id}"/>
+                          </td>
+                          <td>
+                            <span t-out="inv_values['currency']"/>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <table class="table table-sm">
+                      <thead>
+                        <tr>
+                          <th class="text-start">Fecha de la Factura</th>
+                          <th class="text-start">Número de Factura</th>
+                          <th class="text-end">Monto Original</th>
+                          <th class="text-end">Monto Pagado</th>
+                          <th class="text-end">Saldo</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr t-foreach="cfdi['invoices']" t-as="inv_values">
+                          <t t-set="invoice" t-value="inv_values['invoice']"/>
+                          <td>
+                            <span t-field="invoice.invoice_date"/>
+                          </td>
+                          <td>
+                            <span t-field="invoice.name"/>
+                          </td>
+                          <td class="text-end">
+                            <span t-field="invoice.amount_total"/>
+                          </td>
+                          <td class="text-end">
+                            <span t-out="invoice.amount_total - invoice.amount_residual" t-options="{'widget': 'monetary', 'display_currency': invoice.currency_id}"/>
+                          </td>
+                          <td class="text-end">
+                            <span t-field="invoice.amount_residual"/>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <div class="row" id="complement">
+                      <div class="barcode col-3">
+                        <img alt="Barcode" t-att-src="cfdi['barcode_src']"/>
+                      </div>
+                      <div class="complement-details col-9">
+                        <div class="digital-stamp">
+                          Sello digital del emisor
+                        </div>
+                        <div class="digital-stamp-content">
+                          <span t-out="cfdi['sello_sat']"/>
+                        </div>
+                        <div class="digital-stamp">
+                          Sello digital del SAT
+                        </div>
+                        <div class="digital-stamp-content">
+                          <span t-out="cfdi['sello_sat']"/>
+                        </div>
+                        <div class="digital-stamp">
+                          Cadena original del complemento del certificado digital del SAT
+                        </div>
+                        <div class="digital-stamp-content">
+                          <span class="nowrap" t-out="cfdi['cadena']"/>
+                        </div>
+                        <div class="digital-stamp">
+                          Información Extra
+                        </div>
+                        <div class="digital-stamp-content">
+                          Certificado del emisor:: <span t-out="cfdi['certificate_number']"/>
+                          | Certificado SAT: <span t-out="cfdi['certificate_sat_number']"/>
+                          | Lugar de expedición: <span t-out="cfdi['expedition']"/>
+                          | Régimen Fiscal: <span t-out="cfdi['fiscal_regime']"/>
+                          | Fecha de Emisión: <span t-out="cfdi['emission_date_str']"/>
+                          | Fecha de Certificación: <span t-out="cfdi['stamp_date']"/>
+                          | Folio Fiscal: <span t-out="cfdi['uuid']"/>
+                        </div>
+                        <div class="digital-stamp-content text-center">
+                          <strong>Este documento es una representación impresa de un CFDI</strong>
+                        </div>
+                      </div>
+                    </div>
+                  </t>
+                </div>
+            </div>
+                <div class="oe_structure"/>
+              </t>
+            </xpath>
+
+    </template>
+</odoo>

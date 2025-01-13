@@ -1,0 +1,27 @@
+<odoo>
+    <data>
+        <!-- Heredamos la vista de formulario de account.move -->
+        <record id="view_move_form_inherited_related_lines" model="ir.ui.view">
+            <field name="name">account.move.form.inherited.related.lines</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                <!-- Añadimos una nueva página en el notebook -->
+                <xpath expr="//notebook" position="inside">
+                    <page string="Líneas Relacionadas">
+                        <field name="related_move_lines" nolabel="1">
+                            <tree>
+                                <field name="account_id"/>
+                                <field name="name"/>
+                                <field name="date"/>
+                                <field name="move_id"/>
+                                <field name="debit" sum="Total"/>
+                                <field name="credit" sum="Total"/>
+                            </tree>
+                        </field>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

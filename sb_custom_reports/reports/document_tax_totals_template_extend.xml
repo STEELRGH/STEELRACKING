@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- @author Josué Flores Osorio -->
+<odoo>
+    <data>
+        <template id="document_tax_totals_template_extend" inherit_id="account.document_tax_totals">
+            <xpath expr="/t[@t-name='account.document_tax_totals']" position="replace">
+                <t t-foreach="tax_totals['subtotals']" t-as="subtotal">
+                    <tr class="o_subtotal">
+                        <td style="width:30%;" class="text-start not_margin_td"><span class="fw-bold">Importe sin impuestos</span></td>
+                        <td style="width:40%;" class="text-end fw-bold text-end not_margin_td">
+                            <span t-att-class="oe_subtotal_footer_separator" t-out="subtotal['formatted_amount']">27.00</span>
+                        </td>
+                    </tr>
+
+                    <t t-set="subtotal_to_show" t-value="subtotal['name']"/>
+                    <t t-call="account.tax_groups_totals"/>
+
+                    <tr t-if="'formatted_rounding_amount' in tax_totals and tax_totals['rounding_amount'] != 0">
+                        <td class="text-start not_margin_td" style="width:60%;" colspan="2">Rounding</td>
+                        <td class="text-end not_margin_td" style="width:40%;">
+                            <span t-out="tax_totals['formatted_rounding_amount']">0</span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="text-start background_primary border_b" style="padding: 0px 0px 0px 5px; width:30%; border-style: none;"><span class="fw-bold font_color_white">Total</span></td>
+                        <td class="text-end background_primary border_b" style="padding: 0px 5px 0px 0px; width:40%; border-style: none;">
+                            <span class="fw-bold font_color_white" t-out="tax_totals['formatted_amount_total']">31.05</span>
+                        </td>
+                    </tr>
+                </t>
+            </xpath>
+        </template>
+        
+    </data>
+</odoo>
