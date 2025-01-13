@@ -219,10 +219,10 @@
                   <div class="oe_structure">​</div>
                 </div>
                 <div>
-                  <p t-if="doc.carrier_id.carrier_description" id="carrier_description">
+                  <!-- <p t-if="doc.carrier_id.carrier_description" id="carrier_description">
                     <strong>Shipping Description:</strong>
                     <span t-out="doc.carrier_id.carrier_description"/>
-                  </p>
+                  </p> -->
                   <span t-field="doc.note" t-attf-style="#{'text-align:justify;text-justify:inter-word;' if doc.company_id.terms_type != 'html' else ''}" name="order_note"/>
                   <p t-if="not is_html_empty(doc.payment_term_id.note)">
                     <span t-field="doc.payment_term_id.note">The payment should also be transmitted with love</span>
