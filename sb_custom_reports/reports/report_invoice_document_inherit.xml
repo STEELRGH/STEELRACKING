@@ -242,8 +242,8 @@
                                     </td>
                                     <td name="account_invoice_line_name" class="h6">
                                         <span t-if="line.product_id.name" t-field="line.product_id.name" t-options="{'widget': 'text'}">Bacon Burger</span>
-                                        <t t-set="pos_orders" t-value="o.sudo().pos_order_ids"/>
-                                        <t t-if="pos_orders">
+                                        <!-- <t t-set="pos_orders" t-value="o.sudo().pos_order_ids"/> -->
+                                        <!-- <t t-if="pos_orders">
                                             <div style="margin-left:15px; font-style: italic">
                                                 <t t-set="down_payment_product" t-value="pos_orders[0].config_id.down_payment_product_id"/>
                                                 <t t-if="line.product_id == down_payment_product">
@@ -266,7 +266,7 @@
                                                     </t>
                                                 </t>
                                             </div>
-                                        </t>
+                                        </t> -->
                                     </td>
 
                                     <td name="td_product_code" class="text-end" style="width:150px">
