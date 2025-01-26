@@ -10,9 +10,9 @@ class SaleOrderInherit(models.Model):
     centro_id = fields.Many2one('centros', string='Centro de Venta', required=True, domain=[('state', '=', 'active')])
 
 
-    def _create_invoices(self, grouped=False, final=False):
+    def create_invoices(self, grouped=False, final=False):
         """Sobrescribe la función de creación de facturas para agregar el centro automáticamente."""
-        invoices = super(SaleOrderInherit, self)._create_invoices(grouped=grouped, final=final)
+        invoices = super(SaleOrderInherit, self).create_invoices(grouped=grouped, final=final)
         for invoice in invoices:
             invoice.centro_id = self.centro_id
         return invoices
