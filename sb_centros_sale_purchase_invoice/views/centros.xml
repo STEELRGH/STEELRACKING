@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+  <data>
+   
+    <record id="view_centro_form" model="ir.ui.view">
+        <field name="name">centros.venta.compra.form</field>
+        <field name="model">centros</field>
+        <field name="arch" type="xml">
+            <form string="Centro de Venta y Compra">
+
+                <header>
+                    <button name="action_draft" string="Establecer como Borrador" type="object" class="btn-secondary" attrs="{'invisible': [('state', '=', 'draft')]}"/>
+                    <button name="action_active" string="Activar" type="object" class="btn-primary" attrs="{'invisible': [('state', 'in', ['active', 'inactive'])]}"/>
+                    <button name="action_inactive" string="Inactivar" type="object" class="btn-danger" attrs="{'invisible': [('state', '=', 'inactive')]}"/>
+
+                    <field name="state" widget="statusbar" statusbar_visible="draft,open,closed"/>
+                </header>
+
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="location"/>
+                        <field name="company_id"/>
+                    </group>
+                    <notebook>
+                        <page string="Órdenes de Venta">
+                            <field name="sale_order_ids" widget="one2many_list" options="{'no_create': True, 'no_edit': True, 'no_delete': True}"/>
+                        </page>
+                        <page string="Órdenes de Compra">
+                            <field name="purchase_order_ids" widget="one2many_list" options="{'no_create': True, 'no_edit': True, 'no_delete': True}"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                 <!-- Sección para el chatter -->
+                <div class="oe_chatter">
+                    <field name="message_ids" widget="mail_thread"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_centros_tree" model="ir.ui.view">
+        <field name="name">centros.venta.compra.tree</field>
+        <field name="model">centros</field>
+        <field name="arch" type="xml">
+            <tree string="Centros de Venta y Compra">
+                <field name="name"/>
+                <field name="location"/>
+                <field name="total_transactions"/>
+                <field name="company_id"/>
+                <field name="state" string="Estado" widget="badge" decoration-success="state == 'active'" decoration-danger="state == 'inactive'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_centros" model="ir.actions.act_window">
+        <field name="name">Centros</field>
+        <field name="res_model">centros</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Sin registros de centros
+            </p>
+            <p>
+                Realiza tu primer registro
+            </p>
+        </field>
+    </record>
+
+
+    <menuitem id="menu_centros_root" name="Centros" web_icon="sb_centros_sale_purchase_invoice,static/description/icon.png" groups="sb_centros_sale_purchase_invoice.group_centros_user"/>
+    <menuitem id="menu_centro_management" parent="menu_centros_root" name="Gestión de Centros" action="action_centros" />
+    
+  </data>
+</odoo>
