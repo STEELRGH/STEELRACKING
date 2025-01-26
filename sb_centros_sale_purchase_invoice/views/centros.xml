@@ -9,9 +9,9 @@
             <form string="Centro de Venta y Compra">
 
                 <header>
-                    <button name="action_draft" string="Establecer como Borrador" type="object" class="btn-secondary" attrs="{'invisible': [('state', '=', 'draft')]}"/>
-                    <button name="action_active" string="Activar" type="object" class="btn-primary" attrs="{'invisible': [('state', 'in', ['active', 'inactive'])]}"/>
-                    <button name="action_inactive" string="Inactivar" type="object" class="btn-danger" attrs="{'invisible': [('state', '=', 'inactive')]}"/>
+                    <button name="action_draft" string="Establecer como Borrador" type="object" class="btn-secondary" invisible="state not in ('draft')"/>
+                    <button name="action_active" string="Activar" type="object" class="btn-primary" invisible="state not in ('active', 'inactive')"/>
+                    <button name="action_inactive" string="Inactivar" type="object" class="btn-danger" invisible="state not in ('inactive')"/>
 
                     <field name="state" widget="statusbar" statusbar_visible="draft,open,closed"/>
                 </header>
