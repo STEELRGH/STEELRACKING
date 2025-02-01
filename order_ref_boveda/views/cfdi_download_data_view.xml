@@ -1,0 +1,36 @@
+<odoo>
+    <data>
+        <!-- Heredar la vista de árbol original para modificarla -->
+        <record id="cfdi_download_data_tree_inherited" model="ir.ui.view">
+            <field name="name">cfdi.download.data.tree.inherited</field>
+            <field name="model">cfdi.download.data</field>
+            <field name="inherit_id" ref="cfdi_boveda_fiscal.cfdi_download_data_tree"/>
+            <field name="arch" type="xml">
+                <!-- Establecer la vista como editable -->
+                <xpath expr="//tree" position="replace">
+                    <tree editable="top">
+                        <field name="uuid"/>
+                        <field name="filename" optional="hide"/>
+                        <!--<field name="request_id" optional="hide"/>-->
+                        <field name="pack_id" optional="hide" readonly="1"/>
+                        <field name="emisor" readonly="1"/>
+                        <field name="rs_emisor" readonly="1"/>
+                        <field name="fecha" readonly="1"/>
+                        <field name="tipo" readonly="1"/>
+                        <field name="serie" readonly="1"/>
+                        <field name="folio" readonly="1"/>
+                        <field name="total" readonly="1"/>
+                        <field name="conceptos" optional="hide" readonly="1"/>
+                        <field name="order_reference"/>
+                        <field name="invoice_id" readonly="1"/>
+                        <field name="invoice_payment_state" readonly="1"/>
+                        <field name="company_id" invisible="1" readonly="1"/>
+                        <button name="create_invoice" type="object" class="fa fa-file" title='Crear factura' invisible="invoice_id != False" />
+                        <button name="view_invoice" type="object" class="fa fa-file-text-o" title='Ver factura' invisible="invoice_id == False" />
+                    </tree>
+                </xpath>
+                
+            </field>
+        </record>
+    </data>
+</odoo>
