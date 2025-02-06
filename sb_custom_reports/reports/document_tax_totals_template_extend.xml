@@ -32,7 +32,7 @@
                     </tr>
 
                     <tr>
-                        <td class="text-start background_primary border_b" style="padding: 0px 0px 0px 5px; width:30%; border-style: none;"><span class="fw-bold font_color_white">Total</span></td>
+                        <td class="text-start background_primary border_b" style="padding: 0px 0px 0px 5px; width:30%; border-style: none;"><span class="fw-bold font_color_white">Total</span> <span class="m-0 fw-bold" t-field="o.currency_id.name"/></td>
                         <td class="text-end background_primary border_b" style="padding: 0px 5px 0px 0px; width:40%; border-style: none;">
                             <span class="fw-bold font_color_white" t-out="tax_totals['formatted_amount_total']">31.05</span>
                         </td>

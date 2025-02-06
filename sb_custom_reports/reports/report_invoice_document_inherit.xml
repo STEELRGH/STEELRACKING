@@ -364,15 +364,6 @@
                         
                         <!-- <t t-call="account.document_tax_totals_company_currency_template"/> -->
                     </div>
-
-
-                    <div class="row" style="margin-top: 50px;">
-                        <p class="text-end" t-if="o.company_id.display_invoice_amount_total_words">
-                        <small class="text-muted">
-                            <span t-field="o.amount_total_words" style="font-weight: bolder;">Thirty one dollar and Five cents</span>
-                        </small>
-                        </p>
-                    </div>
                     
 
                 <t groups="stock_account.group_lot_on_invoice">
@@ -445,13 +436,21 @@
                     </div>
                 </div> -->
 
+                <div class="row" style="margin-top: 50px;">
+                    <p class="text-end" t-if="o.company_id.display_invoice_amount_total_words">
+                    <small class="text-muted">
+                        <span t-field="o.amount_total_words" style="font-weight: bolder;">Thirty one dollar and Five cents</span>
+                    </small>
+                    </p>
+                </div>
+
                 <div class="row align-items-center py-3">
                     <div class="col-md-4 text-center">
                         <p class="mb-2" style="font-weight: bold; font-size: 12px;">RECIBÍ DE CONFORMIDAD</p>
                         <div style="border-top: 2px solid #000; width: 80%; margin: 10px auto;"></div>
                         <p class="mb-0" style="font-weight: bold; font-size: 12px;">FIRMA</p>
                     </div>
-                    <div class="col-md-8 text-end">
+                    <div class="col-md-8 text-start">    
                         <p class="mb-2" style="font-weight: bold; font-size: 16px; color: #333;">CUENTAS PARA DEPÓSITO</p>
                         <p class="mb-1" style="font-size: 14px; color: #555;">
                             <strong>BANAMEX PESOS</strong> - SUC: 838, CUENTA: 7669982, CLABE: 002150083876699824
