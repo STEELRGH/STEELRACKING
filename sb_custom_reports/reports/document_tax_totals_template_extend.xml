@@ -13,12 +13,10 @@
                     </tr>
                     <!-- Solo mostrar la línea de descuento si existe al menos un descuento en alguna línea de la factura -->
                     <t t-if="any(line.discount > 0 for line in o.invoice_line_ids)">
-                        <tr>
-                            <td colspan="4" style="text-align: right;">
-                                <strong>Descuento:</strong>
-                            </td>
-                            <td style="text-align: right;">
-                                <span t-esc="sum(line.price_unit * line.quantity * (line.discount / 100) for line in o.invoice_line_ids)"/>
+                        <tr class="discount">
+                            <td style="width:30%;" class="text-start not_margin_td"><span class="fw-bold">Descuento</span></td>
+                            <td style="width:40%;" class="text-end fw-bold text-end not_margin_td">
+                                 <span t-esc="sum(line.price_unit * line.quantity * (line.discount / 100) for line in o.invoice_line_ids)"/>
                             </td>
                         </tr>
                     </t>

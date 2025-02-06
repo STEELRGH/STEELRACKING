@@ -365,7 +365,15 @@
                         <!-- <t t-call="account.document_tax_totals_company_currency_template"/> -->
                     </div>
 
-                
+
+                    <div class="row" style="margin-top: 50px;">
+                        <p class="text-end" t-if="o.company_id.display_invoice_amount_total_words">
+                        <small class="text-muted">
+                            <span t-field="o.amount_total_words" style="font-weight: bolder;">Thirty one dollar and Five cents</span>
+                        </small>
+                        </p>
+                    </div>
+                    
 
                 <t groups="stock_account.group_lot_on_invoice">
                     <t t-set="lot_values" t-value="o._get_invoiced_lot_values()"/>
@@ -422,14 +430,6 @@
                             </div>
                         </div>
                     </t>
-                </div>
-
-                <div class="row" style="margin-top: 50px;">
-                    <p class="text-start" t-if="o.company_id.display_invoice_amount_total_words">
-                    <small class="text-muted">
-                        <span t-field="o.amount_total_words" style="font-weight: bolder;">Thirty one dollar and Five cents</span>
-                    </small>
-                    </p>
                 </div>
 
                 <!-- <div class="row">
