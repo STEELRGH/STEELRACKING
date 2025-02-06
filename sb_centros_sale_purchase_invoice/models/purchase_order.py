@@ -7,7 +7,7 @@ class PurchaseOrderInherit(models.Model):
     _description = 'Campo para relacionar al centro'
 
 
-    centro_id = fields.Many2one('centros', string='Centro de Compra', required=True, domain=[('state', '=', 'active')])
+    centro_id = fields.Many2one('centros', string='Puntos de venta', required=True, domain=[('state', '=', 'active')])
 
 
 

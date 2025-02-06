@@ -18,7 +18,7 @@ Long description of module's purpose
     'version': '1.0',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'account', 'l10n_mx_edi', 'sale_management'],
+    'depends': ['base', 'account', 'l10n_mx_edi', 'sale_management', 'sb_centros_sale_purchase_invoice'],
 
     # always loaded
     'data': [
