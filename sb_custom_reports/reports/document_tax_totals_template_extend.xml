@@ -11,6 +11,17 @@
                             <span t-att-class="oe_subtotal_footer_separator" t-out="subtotal['formatted_amount']">27.00</span>
                         </td>
                     </tr>
+                    <!-- Solo mostrar la línea de descuento si existe al menos un descuento en alguna línea de la factura -->
+                    <t t-if="any(line.discount > 0 for line in o.invoice_line_ids)">
+                        <tr>
+                            <td colspan="4" style="text-align: right;">
+                                <strong>Descuento:</strong>
+                            </td>
+                            <td style="text-align: right;">
+                                <span t-esc="sum(line.price_unit * line.quantity * (line.discount / 100) for line in o.invoice_line_ids)"/>
+                            </td>
+                        </tr>
+                    </t>
 
                     <t t-set="subtotal_to_show" t-value="subtotal['name']"/>
                     <t t-call="account.tax_groups_totals"/>
