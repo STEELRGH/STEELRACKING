@@ -11,7 +11,7 @@
                     <field name="centro_id" readonly="state in ('posted','cancel')"/>
                 </xpath>
 
-                <xpath expr="//field[@name='currency_id']" position="after">
+                <xpath expr="//field[@name='journal_id']" position="after">
                     <field name="exchange_rate"/>
                 </xpath>
                 

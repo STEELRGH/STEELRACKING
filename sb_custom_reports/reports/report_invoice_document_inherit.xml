@@ -39,7 +39,6 @@
                         <span t-if="o.name != '/'" t-field="o.name">INV/2023/0001</span>
                     </h2>
                     <small class="text-end fw-bold">Folio fiscal:</small> <small t-out="cfdi_values.get('uuid')">No identificado</small>
-                    <small class="text-end" t-if="o.centro_id">Centro de venta: </small><small t-if="o.centro_id" t-field="o.centro_id">No tiene</small>
                 </div>
             </div>
             <div class="clearfix mb8"/>
@@ -64,6 +63,20 @@
 </template>
 
    <template id="custom_report_invoice_document" inherit_id="account.report_invoice_document">
+
+    <xpath expr="//t[@t-set='subtotal']" position="after">
+        <!-- Solo mostrar la línea de descuento si existe al menos un descuento en alguna línea de la factura -->
+        <t t-if="any(line.discount > 0 for line in o.invoice_line_ids)">
+            <tr>
+                <td colspan="4" style="text-align: right;">
+                    <strong>Descuento:</strong>
+                </td>
+                <td style="text-align: right;">
+                    <span t-esc="sum(line.price_unit * line.quantity * (line.discount / 100) for line in o.invoice_line_ids)"/>
+                </td>
+            </tr>
+        </t>
+    </xpath>
 
     <xpath expr="/t[@t-name='account.report_invoice_document']" position="replace" mode="inner">
         <t t-call="sb_custom_reports.custom_report_invoice_external_layout">
@@ -180,6 +193,10 @@
                 <div t-attf-class="#{'col-auto col-3 mw-100' if report_type != 'html' else 'col'} mb-2" t-if="o.exchange_rate" name="exchange_rate">
                     <strong>Tipo de cambio:</strong>
                     <p class="m-0 h6" t-field="o.exchange_rate"/>
+                </div>
+                <div t-attf-class="#{'col-auto col-3 mw-100' if report_type != 'html' else 'col'} mb-2" t-if="o.centro_id" name="centro_id">
+                    <strong>Centro de venta:</strong>
+                    <p class="m-0 h6" t-field="o.centro_id"/>
                 </div>
                 <div t-attf-class="#{'col-auto col-3 mw-100' if report_type != 'html' else 'col'} mb-2" t-if="o.partner_id.ref" name="customer_code">
                     <strong>Código cliente:</strong>
@@ -327,17 +344,6 @@
                             <div class="ms-auto">
                                 <table class="table table-sm table-borderless avoid-page-break-inside">
                                     <t t-set="tax_totals" t-value="o.tax_totals"/>
-                                    <!-- Solo mostrar la línea de descuento si existe al menos un descuento en alguna línea de la factura -->
-                                    <t t-if="any(line.discount > 0 for line in o.invoice_line_ids)">
-                                        <tr>
-                                            <td colspan="4" style="text-align: right;">
-                                                <strong>Descuento:</strong>
-                                            </td>
-                                            <td style="text-align: right;">
-                                                <span t-esc="sum(line.price_unit * line.quantity * (line.discount / 100) for line in o.invoice_line_ids)"/>
-                                            </td>
-                                        </tr>
-                                    </t>
                                     <t t-call="account.document_tax_totals"/>
                                     <!-- <t t-if="print_with_payments">
                                     <t t-if="o.payment_state != 'invoicing_legacy'">
