@@ -62,21 +62,23 @@
     </div>
 </template>
 
-   <template id="custom_report_invoice_document" inherit_id="account.report_invoice_document">
+    <template id="custom_document_tax_totals_template" inherit_id="account.document_tax_totals_template">
+        <xpath expr="//t[@t-set='subtotal_to_show']" position="after">
+            <!-- Solo mostrar la línea de descuento si existe al menos un descuento en alguna línea de la factura -->
+            <t t-if="any(line.discount > 0 for line in o.invoice_line_ids)">
+                <tr>
+                    <td colspan="4" style="text-align: right;">
+                        <strong>Descuento:</strong>
+                    </td>
+                    <td style="text-align: right;">
+                        <span t-esc="sum(line.price_unit * line.quantity * (line.discount / 100) for line in o.invoice_line_ids)"/>
+                    </td>
+                </tr>
+            </t>
+        </xpath>
+    </template>
 
-    <xpath expr="//t[@t-set='subtotal']" position="after">
-        <!-- Solo mostrar la línea de descuento si existe al menos un descuento en alguna línea de la factura -->
-        <t t-if="any(line.discount > 0 for line in o.invoice_line_ids)">
-            <tr>
-                <td colspan="4" style="text-align: right;">
-                    <strong>Descuento:</strong>
-                </td>
-                <td style="text-align: right;">
-                    <span t-esc="sum(line.price_unit * line.quantity * (line.discount / 100) for line in o.invoice_line_ids)"/>
-                </td>
-            </tr>
-        </t>
-    </xpath>
+   <template id="custom_report_invoice_document" inherit_id="account.report_invoice_document">
 
     <xpath expr="/t[@t-name='account.report_invoice_document']" position="replace" mode="inner">
         <t t-call="sb_custom_reports.custom_report_invoice_external_layout">
