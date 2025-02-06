@@ -445,19 +445,25 @@
                     </div>
                 </div> -->
 
-                <div class="row align-items-center py-3" style="padding-top: 50px;">
-                    <div class="col-md-4 text-center">
-                        <p class="mb-2" style="font-weight: bold; font-size: 12px;">RECIBÍ DE CONFORMIDAD</p>
-                        <div style="border-top: 2px solid #000; width: 80%; margin: 10px auto;"></div>
-                        <p class="mb-0" style="font-weight: bold; font-size: 12px;">FIRMA</p>
-                    </div>
-                    <div class="col-md-8 text-start">
-                        <p class="mb-2" style="font-weight: bold; font-size: 16px; color: #333;">CUENTAS PARA DEPÓSITO</p>
-                        <p class="mb-1" style="font-size: 14px; color: #555;">
-                            <strong>BANAMEX PESOS</strong> - SUC: 838, CUENTA: 7669982, CLABE: 002150083876699824
+                <div class="row">
+                    <div class="col-4 text-center text">
+                        <p style="margin-bottom: 0px;">
+                            <br/>
                         </p>
-                        <p class="mb-0" style="font-size: 14px; color: #555;">
-                            <strong>BANAMEX DÓLARES</strong> - SUC: 838, CUENTA: 9332047, CLABE: 002150083893320477
+                        <hr/>
+                        <p style="margin-bottom: 0px;">
+                        <span style="font-weight: bolder; font-size: 10px;">RECIBÍ DE CONFORMIDAD FIRMA</span>
+                        </p>
+                    </div>
+                    <div class="col-8 text-end">
+                        <p style="margin-bottom: 0px;">
+                            <span style="font-weight: bolder; font-size: 14px;">CUENTAS PARA DEPÓSITO</span>
+                        </p>
+                        <p style="margin-bottom: 0px;">
+                            <span style="font-size: 12px;">BANAMEX PESOS SUC: 838, CUENTA: 7669982, CLABE INTERBANCARIA: 002150083876699824</span>
+                        </p>
+                        <p style="margin-bottom: 0px;">
+                            <span style=" font-size: 12px">BANAMEX DOLARES, SUC 838, CUENTA: 9332047, CLABE INTERBANCARIA: 002150083893320477</span>
                         </p>
                     </div>
                 </div>
