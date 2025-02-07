@@ -1,0 +1,29 @@
+<odoo>
+    <data>
+        <!-- Heredar la vista de formulario de ventas para agregar 'referencia_xml' -->
+        <record id="view_sale_order_form_inherited_referencia_xml" model="ir.ui.view">
+            <field name="name">sale.order.form.inherited.referencia.xml</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <!-- Agregar 'referencia_xml' después del campo 'partner_id' -->
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="referencia_xml" readonly="1"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Heredar la vista de formulario de compras para agregar 'referencia_xml' -->
+        <record id="view_purchase_order_form_inherited_referencia_xml" model="ir.ui.view">
+            <field name="name">purchase.order.form.inherited.referencia.xml</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form"/>
+            <field name="arch" type="xml">
+                <!-- Agregar 'referencia_xml' después del campo 'partner_id' -->
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="referencia_xml" readonly="1"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
