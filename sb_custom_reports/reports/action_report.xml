@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <record id="action_report_invoice" model="ir.actions.report">
+        <!-- <record id="action_report_invoice" model="ir.actions.report">
            <field name="name">Factura | Movill</field>
            <field name="model">account.move</field>
            <field name="report_type">qweb-pdf</field>
@@ -10,6 +10,19 @@
            <field name="print_report_name">object.name</field>
            <field name="binding_model_id" ref="account.model_account_move"/>
            <field name="binding_type">report</field>
+        </record> -->
+
+
+        <record id="action_payment_receipt" model="ir.actions.report">
+           <field name="name">Recibo de pago detallado</field>
+           <field name="model">account.payment</field>
+           <field name="report_type">qweb-pdf</field>
+           <field name="report_name">sb_custom_reports.custom_report_payment_receipt_document</field>
+           <field name="report_file">sb_custom_reports.custom_report_payment_receipt_document</field>
+           <field name="print_report_name">object.name</field>
+           <field name="binding_model_id" ref="account.model_account_payment"/>
+           <field name="binding_type">report</field>
         </record>
+
     </data>
 </odoo>

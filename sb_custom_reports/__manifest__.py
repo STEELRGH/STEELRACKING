@@ -23,7 +23,7 @@ Long description of module's purpose
     # always loaded
     'data': [
         # 'security/ir.model.access.csv',
-        # 'reports/action_report.xml',
+        'reports/action_report.xml',
         # 'reports/report_invoice_document.xml',
         'reports/external_layout_striped_inherit.xml',
         'reports/document_tax_totals_template_extend.xml',
