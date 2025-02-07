@@ -51,7 +51,12 @@
 
     <div t-attf-class="o_company_#{company.id}_layout footer font_lemon">
         <div class="text-center" style="border-top: 2px solid black; border-bottom: 2px solid black;">
-            <p class="text-uppercase" style="padding-top: 6px;"><b><t t-esc="company.street"/>, <t t-esc="company.l10n_mx_edi_colony"/>, C.P. <t t-esc="company.zip"/>, <t t-esc="company.l10n_mx_edi_locality_id.name"/>, <t t-esc="company.state_id.code"/>., RFC: <t t-esc="company.vat"/></b></p>
+            <p class="text-uppercase" style="padding-top: 6px;">
+            <b><t t-esc="company.street"/>, 
+            <t t-esc="company.l10n_mx_edi_colony"/>, 
+            C.P. <t t-esc="company.zip"/>, 
+            <t t-esc="company.l10n_mx_edi_locality_id.name"/>, 
+            <t t-esc="company.state_id.code"/>., RFC: <t t-esc="company.vat"/></b></p>
             <img t-att-src="'/sb_custom_reports/static/src/img/partners.jpg'" style="padding: 10px;"/>
         </div>
     </div>
@@ -72,8 +77,8 @@
             <div class="col-5 offset-2 text-start">
                 <span>
                     <p style="margin-bottom: 0px;" class="h6 text-black-75 o_bold h6">Atención: <span t-field="o.partner_shipping_id.name" class="h6"/></p>
-                    <span><p style="margin-bottom: 0px;" class="h6 text-black-75 o_bold h6">Referencia:  <span t-field="o.ref"/></p></span>   
-                    <span><p style="margin-bottom: 0px;" class="h6 text-black-75 o_bold h6">Asesor Técnico: <span t-field="o.invoice_user_id.name"/></p></span>
+                    <span><p style="margin-bottom: 0px;" class="h6 text-black-75 o_bold h6">O.Compra:  <span t-field="o.ref"/></p></span>   
+                    <span><p style="margin-bottom: 0px;" class="h6 text-black-75 o_bold h6">Agente de venta: <span t-field="o.invoice_user_id.name"/></p></span>
                 </span>
             </div>
         </div>
@@ -171,10 +176,14 @@
                     <br/>
                     <span t-field="o.invoice_origin" class="m-0 h6">SO123</span>
                 </div>
-                <!-- <div t-attf-class="#{'col-auto col-3 mw-100' if report_type != 'html' else 'col'} mb-2" t-if="o.pos_refunded_invoice_ids" name="source_invoice">
-                    <strong>Factura origen:</strong>
-                    <p class="m-0 h6" t-field="o.pos_refunded_invoice_ids"/>
-                </div> -->
+                <div t-attf-class="#{'col-auto col-3 mw-100' if report_type != 'html' else 'col'} mb-2" name="exchange_rate">
+                    <strong>Tipo de cambio:</strong>
+                    <p class="m-0 h6" t-field="o.exchange_rate"/>
+                </div>
+                <div t-attf-class="#{'col-auto col-3 mw-100' if report_type != 'html' else 'col'} mb-2" t-if="o.centro_id" name="centro_id">
+                    <strong>Centro de venta:</strong>
+                    <p class="m-0 h6" t-field="o.centro_id"/>
+                </div>
                 <div t-attf-class="#{'col-auto col-3 mw-100' if report_type != 'html' else 'col'} mb-2" t-if="o.partner_id.ref" name="customer_code">
                     <strong>Código cliente:</strong>
                     <br/>
@@ -415,15 +424,15 @@
                     </t>
                 </div>
 
-                <div class="row" style="margin-top: 50px;">
+                <!-- <div class="row" style="margin-top: 50px;">
                     <p class="text-start" t-if="o.company_id.display_invoice_amount_total_words">
                     <small class="text-muted">
                         <span t-field="o.amount_total_words" style="font-weight: bolder;">Thirty one dollar and Five cents</span>
                     </small>
                     </p>
-                </div>
+                </div> -->
 
-                <div class="row">
+                <!-- <div class="row">
                     <div class="col-12 small">
                         <p style="margin-bottom: 0px;">
                         <span style="font-weight: bolder; font-size: 14px;">PAGARÉ:</span>
@@ -434,7 +443,7 @@
                         <span style="font-size: 12px;">POR ESTE PAGARE ME OBLIGO A LA ORDEN DE PROVEEDORA INDUSTRIAL MOVILL DE CHIHUAHUA SA DE CV, EN LA CIUDAD DE CHIHUAHUA CHIH., SI ESTE PAGARE NO SE CUBRIERA A SU VENCIMIENTO, CAUSARÁ UN INTERES MORATORIO DEL10% MENSUAL HASTA SU LIQUIDACIÓN. EN CHEQUES DEVUELTOS SE COBRARÁ EL 20% DEL TOTAL DE ESTA FACTURA.</span>
                         </p>
                     </div>
-                </div>
+                </div> -->
 
                 <div class="row">
                     <div class="col-4 text-center text">

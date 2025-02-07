@@ -9,6 +9,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='ref']" position="after">
                     <field name="centro_id" readonly="state in ('posted','cancel')"/>
+                    <field name="exchange_rate"/>
                 </xpath>
             </field>
         </record>

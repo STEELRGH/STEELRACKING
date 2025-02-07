@@ -7,7 +7,7 @@ class SaleOrderInherit(models.Model):
     _description = 'Campo para relacionar al centro'
 
 
-    centro_id = fields.Many2one('centros', string='Centro de Venta', required=True, domain=[('state', '=', 'active')])
+    centro_id = fields.Many2one('centros', string='Puntos de venta', required=True, domain=[('state', '=', 'active')])
 
 
     def _create_invoices(self, grouped=False, final=False):
