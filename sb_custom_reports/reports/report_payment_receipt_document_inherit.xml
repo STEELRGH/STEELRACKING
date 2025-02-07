@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <template id="custom_report_payment_receipt_document">
+
+    <record id="action_payment_receipt" model="ir.actions.report">
+      <field name="name">Recibo de pago detallado</field>
+      <field name="model">account.payment</field>
+      <field name="report_type">qweb-pdf</field>
+      <field name="report_name">sb_custom_reports.sb_report_payment_receipt_document</field>
+      <field name="report_file">sb_custom_reports.sb_report_payment_receipt_document</field>
+      <field name="print_report_name">object.name</field>
+      <field name="binding_model_id" ref="account.model_account_payment"/>
+      <field name="binding_type">report</field>
+    </record>
+
+    <template id="sb_report_payment_receipt_document">
       <t t-call="web.html_container">
       <t t-foreach="docs" t-as="o">
         <t t-call="web.external_layout">
