@@ -23,7 +23,6 @@ Long description of module's purpose
     # always loaded
     'data': [
         # 'security/ir.model.access.csv',
-        'reports/action_report.xml',
         # 'reports/report_invoice_document.xml',
         'reports/external_layout_striped_inherit.xml',
         'reports/document_tax_totals_template_extend.xml',
@@ -31,6 +30,7 @@ Long description of module's purpose
         'reports/report_invoice_document_inherit.xml',
         'reports/report_payment_receipt_document_inherit.xml',
         'reports/report_saleorder_document_inherit.xml',
+        'reports/action_report.xml',
     ],
     'assets': {
         'web.report_assets_common': [
