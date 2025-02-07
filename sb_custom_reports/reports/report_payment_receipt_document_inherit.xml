@@ -1,10 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <template id="custom_report_payment_receipt_document" inherit_id="account.report_payment_receipt_document">
-            <xpath expr="/t[@t-name='account.report_payment_receipt_document']" position="replace" mode="inner">
-              <t t-call="web.external_layout">
-                <t t-set="o" t-value="o.with_context(lang=lang)"/>
-                <t t-set="values" t-value="o._get_payment_receipt_report_values()"/>
+
+    <record id="action_payment_receipt" model="ir.actions.report">
+      <field name="name">Recibo de pago detallado</field>
+      <field name="model">account.payment</field>
+      <field name="report_type">qweb-pdf</field>
+      <field name="report_name">sb_custom_reports.sb_report_payment_receipt_document</field>
+      <field name="report_file">sb_custom_reports.sb_report_payment_receipt_document</field>
+      <field name="print_report_name">object.name</field>
+      <field name="binding_model_id" ref="account.model_account_payment"/>
+      <field name="binding_type">report</field>
+    </record>
+
+    <template id="sb_report_payment_receipt_document">
+      <t t-call="web.html_container">
+      <t t-foreach="docs" t-as="o">
+        <t t-call="web.external_layout">
+          <t t-set="o" t-value="o.with_context(lang=lang)"/>
+          <t t-set="values" t-value="o._get_payment_receipt_report_values()"/>
 
                 <div class="mt-5 clearfix">
                 <div class="page mb-4">
@@ -379,9 +392,11 @@
                   </t>
                 </div>
             </div>
-                <div class="oe_structure"/>
-              </t>
-            </xpath>
+            <div class="oe_structure"/>
+          </t>
+        </t>
+        </t>
+        <!-- </xpath> -->
 
     </template>
 </odoo>
