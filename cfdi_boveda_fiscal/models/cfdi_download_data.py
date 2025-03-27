@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 from base64 import b64decode, b64encode
 from zipfile import ZipFile
-from odoo import api, fields, models, _, tools
+from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
 
@@ -18,8 +18,8 @@ class CfdiDownloadData(models.Model):
     rs_emisor = fields.Char(string="Razón social emisor", required=True)
     fecha = fields.Char(string="Fecha", required=True)
     tipo = fields.Char(string="Tipo", required=True)
-    serie = fields.Char(string="Serie", required=False)
-    folio = fields.Char(string="Folio", required=True)
+    serie = fields.Char(string="Serie")
+    folio = fields.Char(string="Folio")
     total = fields.Char(string="Total", required=True)
     conceptos = fields.Text(string="Conceptos")
     invoice_id = fields.Many2one(comodel_name='account.move', string="Factura")
@@ -27,120 +27,137 @@ class CfdiDownloadData(models.Model):
     company_id = fields.Many2one(comodel_name="res.company", string="Compañia", default=lambda self: self.env.company, copy=True)
 
     def view_invoice(self):
-        # Obtenemos el action       
+        """Retorna la acción para visualizar la factura creada."""
         action_id = self.env["ir.actions.actions"]._for_xml_id("account.action_move_in_invoice_type")
-        # Se actualiza el domain     
         action_id.update({'domain': "[('id', '=', %s)]" % str(self.invoice_id.id)})
         return action_id     
 
     def create_invoice(self):
+        """Crea una factura a partir de los datos descargados del CFDI."""
         for rec in self:
-            # Si ya tiene factura
             if rec.invoice_id:
-                continue            
-            # Se busca el partner y se crea si no existe
-            partner_id = self.env['res.partner'].search([('name', '=', self.rs_emisor)])
+                continue  # Si ya tiene factura, se omite.
+
+            # Buscar o crear el partner
+            partner_id = self.env['res.partner'].search([('name', '=', rec.rs_emisor)], limit=1)
             if not partner_id:
-                partner_id = self.env['res.partner'].create({'name': self.rs_emisor})
-            # Se crea la factura
-            vals = {
+                partner_id = self.env['res.partner'].create({'name': rec.rs_emisor})
+
+            # Crear la factura
+            invoice_vals = {
                 'partner_id': partner_id.id,
                 'move_type': 'in_invoice',
                 'state': 'draft',
-                'invoice_date': self.fecha.split('T')[0]
+                'invoice_date': rec.fecha.split('T')[0],
+                'ref': rec.folio if rec.folio else 'SIN_FOLIO',  # Corrección aquí                
             }
-            invoice_id = self.env['account.move'].create(vals)
-            # Se obtienen los conceptos y se crea una linea para cada concepto
-            cons = eval(rec.conceptos)    
-            for c in cons:
-                # Para cada traslado se busca un impuesto 
-                traslados = c.get('Traslados')
-                # Se buscan los impuestos 
+            invoice_id = self.env['account.move'].create(invoice_vals)
+
+            # Procesar los conceptos
+            try:
+                conceptos = eval(rec.conceptos)
+            except Exception:
+                raise UserError("Error al evaluar los conceptos del XML.")
+
+            for c in conceptos:
+                traslados = c.get('Traslados', [])
                 tax_ids = []
-                total_concepto = 0
+                total_concepto = 0.0
+
                 for traslado in traslados:
-                    total_concepto += float(traslado.get('Base')) + float(traslado.get('Importe'))
+                    base = traslado.get('Base', '0')
+                    importe = traslado.get('Importe', '0')
+                    tasa_o_cuota = traslado.get('TasaOCuota', '0') or '0'  # Evita valores None o vacíos
+
+                    try:
+                        base = float(base)
+                        importe = float(importe)
+                        tasa_o_cuota = float(tasa_o_cuota)  # Convierte a float de forma segura
+                    except ValueError:
+                        base, importe, tasa_o_cuota = 0.0, 0.0, 0.0  # Valores por defecto si hay error
+                        
+                    total_concepto += base + importe
+
                     tax_id = self.env['account.tax'].search([
                         ('active', '=', True),
                         ('type_tax_use', '=', 'purchase'),
-                        ('amount', '=', 100 * float(traslado.get('TasaOCuota')))
-                    ])
+                        ('amount', '=', 100 * tasa_o_cuota)  # Multiplicamos por 100 solo si tasa_o_cuota es válido
+                        #('amount', '=', 100 * float(traslado.get('TasaOCuota', 0)))
+                    ], limit=1)
+
                     if not tax_id:
                         raise UserError(
                             "No se ha configurado el impuesto tipo {} con tasa {}".format(
                                 traslado.get('Impuesto'),
-                                traslado('TasaOCuota')))
+                                traslado.get('TasaOCuota')
+                            )
+                        )
+
                     tax_ids.append((4, tax_id.id, 0))
+
                     tax_repartition_line_id = self.env['account.tax.repartition.line'].search([
                         ('tax_id', '=', tax_id.id),
                         ('company_id', '=', self.env.company.id),
                         ('repartition_type', '=', 'tax')
                     ], limit=1)
-                    # Linea de impuesto
+
                     tax_line = {
                         'move_id': invoice_id.id,
-                        'account_id': tax_id.cash_basis_transition_account_id.id, 
+                        'account_id': tax_id.cash_basis_transition_account_id.id,
                         'quantity': 1,
                         'name': tax_id.name,
-                        'price_unit': float(traslado.get('Importe')),           
-                        'debit': float(traslado.get('Importe')),
+                        'price_unit': importe,           
+                        'debit': importe,
                         'tax_line_id': tax_id.id,
                         'tax_group_id': tax_id.tax_group_id.id,
-                        'tax_base_amount': float(traslado.get('Base')),
+                        'tax_base_amount': base,
                         'tax_repartition_line_id': tax_repartition_line_id.id if tax_repartition_line_id else False,
-                        # 'exclude_from_invoice_tab': True,
                     }
                     self.env['account.move.line'].with_context(check_move_validity=False).create(tax_line)
-                # Linea de débito
-                valor_unitario = float(c.get('ValorUnitario'))
-                if c.get('Descuento') != 'None':
+
+                valor_unitario = float(c.get('ValorUnitario', 0))
+                if c.get('Descuento') not in (None, 'None'):
                     valor_unitario -= float(c.get('Descuento'))
+
                 debit_line = {
                     'move_id': invoice_id.id,
                     'account_id': invoice_id.journal_id.default_account_id.id,
-                    'quantity': float(c.get('Cantidad')),
+                    'quantity': float(c.get('Cantidad', 1)),
                     'price_unit': valor_unitario,
-                    'debit': valor_unitario * float(c.get('Cantidad')),
-                    'product_id': False,
+                    'debit': valor_unitario * float(c.get('Cantidad', 1)),
                     'name': c.get('Descripcion'),
                     'tax_ids': tax_ids if tax_ids else False
-                }            
+                }
                 self.env['account.move.line'].with_context(check_move_validity=False).create(debit_line)
 
-                # Linea de crédito
                 credit_line = {
                     'move_id': invoice_id.id,
                     'account_id': invoice_id.partner_id.property_account_payable_id.id,
-                    'quantity': float(c.get('Cantidad')),
+                    'quantity': float(c.get('Cantidad', 1)),
                     'credit': total_concepto,
-                    # 'exclude_from_invoice_tab': True,
                     'tax_ids': tax_ids if tax_ids else False
-                    }
+                }
                 self.env['account.move.line'].with_context(check_move_validity=False).create(credit_line)
-                                    
-            # Se lee el archivo zip
-            zip_file = open('./'+self.pack_id.id_paquete, "wb")
-            zip_file.write(b64decode(self.pack_id.paquete_b64))
-            zip_file.close()          
-            # 
-            with ZipFile('./'+self.pack_id.id_paquete) as zf:
-                vals_list = []    
-                # Para cada xml de zip        
-                for file in zf.namelist():               
-                    if not file.endswith('.xml'):
-                        continue
-                    if file == self.filename:              
-                        with zf.open(file) as f:                     
-                            # Se adjunta el xml
-                            self.env['ir.attachment'].create({
-                                'name': file,
-                                'type': 'binary',
-                                'datas': b64encode(f.read()),
-                                'res_model': 'account.move',
-                                'res_id': invoice_id.id,
-                                'mimetype': 'application/xml'
-                            })
-                        break            
-            # Se actualiza el campo de la factura
-            rec.invoice_id = invoice_id.id                    
+
+            # Adjuntar XML al registro de factura
+            if rec.pack_id.id_paquete:
+                zip_path = f'./{rec.pack_id.id_paquete}'
+                with open(zip_path, "wb") as zip_file:
+                    zip_file.write(b64decode(rec.pack_id.paquete_b64))
+
+                with ZipFile(zip_path) as zf:
+                    for file in zf.namelist():
+                        if file.endswith('.xml') and file == rec.filename:
+                            with zf.open(file) as f:
+                                self.env['ir.attachment'].create({
+                                    'name': file,
+                                    'type': 'binary',
+                                    'datas': b64encode(f.read()),
+                                    'res_model': 'account.move',
+                                    'res_id': invoice_id.id,
+                                    'mimetype': 'application/xml'
+                                })
+                            break
+
+            rec.invoice_id = invoice_id.id
         return True
