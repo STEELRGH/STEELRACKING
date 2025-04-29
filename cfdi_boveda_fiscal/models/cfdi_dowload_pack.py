@@ -3,6 +3,8 @@ from base64 import b64decode
 import os
 from zipfile import ZipFile
 from odoo import api, fields, models, _, tools
+import logging
+_logger = logging.getLogger(__name__)
 
 
 class CfdiDownloadPack(models.Model):
@@ -24,7 +26,7 @@ class CfdiDownloadPack(models.Model):
     cod_estatus = fields.Char(string="Cod. Estatus", required=True)
     mensaje = fields.Char(string="Mensaje solicitud", required=True)
     paquete_b64 = fields.Text(string="Paquete b64", required=True)
-    company_id = fields.Many2one("res.company", string="Compañia", default=lambda self: self.env.company, copy=True)
+    company_id = fields.Many2one('res.company', default=lambda self: self.env.company.id, store=True)
 
     @api.depends("request_id", "request_id.request_type")
     def _compute_request_type(self):
@@ -72,7 +74,8 @@ class CfdiDownloadPack(models.Model):
                 if not file.endswith('.xml'):
                     continue
                 with zf.open(file) as f:
-                    vals = self.env['request.wizard']._parse_xml_cfdi(f.read())                      
+                    vals = self.env['request.wizard']._parse_xml_cfdi(f.read())  
+                    company = self.env['res.company'].search([('vat','=',vals.get('receptor'))])  
                     if vals:                         
                         val = {                           
                             'uuid': vals.get('uuid'),

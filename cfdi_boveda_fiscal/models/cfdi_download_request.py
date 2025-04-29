@@ -34,6 +34,15 @@ class CfdiDownloadRequest(models.Model):
     _rec_name = 'id_solicitud'
     _order = 'create_date desc'
     # 
+
+    def _default_company_id(self):
+        # Obtener compañía del contexto o la del usuario
+        return (
+            self.env.context.get('force_company') or 
+            self.env.context.get('company_id') or 
+            self.env.company.id
+        )
+    
     fiel_id = fields.Many2one(comodel_name='cfdi.download.fiel', string="FIEL", ondelete='cascade')
     id_solicitud = fields.Char(string="Id. Solicitud", required=True)
     rfc_solicitante = fields.Char(string="RFC solicitante", required=True)
@@ -57,10 +66,14 @@ class CfdiDownloadRequest(models.Model):
     numero_cfdis = fields.Integer(string="CFDI's")
     paquetes = fields.Char(string="Contenido paquetes")   
     num_paquetes = fields.Integer(string="Paquetes")   
-    company_id = fields.Many2one(
-        "res.company", string="Compañia",
-        default=lambda self: self.env.company, copy=True, required=True)
-
+    company_id = fields.Many2one('res.company', default=lambda self: self.env.company.id, store=True)
+    
+    @api.model
+    def create(self, vals):
+        # Asegurar que el RFC esté presente antes de crear
+        vals['company_id'] = self.env.company.id or ''
+        return super().create(vals)
+    
     def verfication_request(self):
         vals = {
             'fiel_id': self.fiel_id.id,
@@ -117,7 +130,8 @@ class CfdiDownloadRequest(models.Model):
                             'serie': xml.get('Serie'),
                             'folio': xml.get('Folio'),
                             'total': xml.get('Total'),
-                            'conceptos': xml.get('Conceptos')
+                            'conceptos': xml.get('Conceptos'),
+                            'company_id': self.env.company.id,
                         }
                         cfdi_obj.create(vals)
                         

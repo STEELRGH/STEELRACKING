@@ -3,7 +3,8 @@ from base64 import b64decode, b64encode
 from zipfile import ZipFile
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
-
+import logging
+_logger = logging.getLogger(__name__)
 
 class CfdiDownloadData(models.Model):
     _name = "cfdi.download.data"
@@ -24,8 +25,8 @@ class CfdiDownloadData(models.Model):
     conceptos = fields.Text(string="Conceptos")
     invoice_id = fields.Many2one(comodel_name='account.move', string="Factura")
     invoice_payment_state = fields.Selection(related='invoice_id.payment_state')
-    company_id = fields.Many2one(comodel_name="res.company", string="Compañia", default=lambda self: self.env.company, copy=True)
-
+    company_id = fields.Many2one('res.company', related="request_id.company_id")
+    
     def view_invoice(self):
         """Retorna la acción para visualizar la factura creada."""
         action_id = self.env["ir.actions.actions"]._for_xml_id("account.action_move_in_invoice_type")
@@ -49,7 +50,8 @@ class CfdiDownloadData(models.Model):
                 'move_type': 'in_invoice',
                 'state': 'draft',
                 'invoice_date': rec.fecha.split('T')[0],
-                'ref': rec.folio if rec.folio else 'SIN_FOLIO',  # Corrección aquí                
+                'ref': rec.folio if rec.folio else 'SIN_FOLIO',  # Corrección aquí
+                'x_studio_cfdi': rec.id,
             }
             invoice_id = self.env['account.move'].create(invoice_vals)
 

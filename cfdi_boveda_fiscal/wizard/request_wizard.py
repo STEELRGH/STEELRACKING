@@ -12,6 +12,8 @@ import xml.etree.cElementTree as ET
 
 from odoo import api, fields, models, _, tools
 from odoo.exceptions import UserError
+import logging
+_logger = logging.getLogger(__name__)
 
 
 class RequestWizard(models.TransientModel):
@@ -89,8 +91,12 @@ class RequestWizard(models.TransientModel):
                 'fecha_final': self.fecha_final,
                 'cod_estatus': result.get('cod_estatus'),
                 'mensaje': result.get('mensaje'),
-                'request_type': self.request_type,            
+                'request_type': self.request_type,
+                'company_id': 1,
             }
+            _logger.info("111111111111111111111111111111")
+            _logger.info(vals)
+            _logger.info("111111111111111111111111111111")
             request_id = self.env['cfdi.download.request'].create(vals)     
             #
             time.sleep(3)
@@ -100,7 +106,8 @@ class RequestWizard(models.TransientModel):
             action_id = self.env["ir.actions.actions"]._for_xml_id("cfdi_boveda_fiscal.cfdi_download_request_action")
             return action_id
         except ValueError:
-            raise UserError('* Revise que tenga una conexión a internet.\n * Revise que la contraseña de la FIEL sea correcta,')           
+            raise UserError('* Revise que tenga una conexión a internet.\n * Revise que la contraseña de la FIEL sea correcta,')
+        request_id.write({'company_id': 1})
 
     def action_verfication_request(self):
         if self.request_id.estado_solicitud_type in ['1', '2', '3', False]:
@@ -130,6 +137,7 @@ class RequestWizard(models.TransientModel):
 
     def action_download_request(self):
         # Se buscan paquetes de la solicitud de descarga
+        _logger.info("*********************** action_download_request")
         pack_ids = self.env['cfdi.download.pack'].search([('request_id', '=', self.request_id.id)])
         # Si el estatus de la solicitud es 3 y no tiene paquetes desacargados se procede a la descarga
         if self.request_id.estado_solicitud_type in ['3'] and not pack_ids:
@@ -178,6 +186,9 @@ class RequestWizard(models.TransientModel):
         if not xml:
             return False
         root = ET.fromstring(xml)
+        _logger.info("***********************")
+        _logger.info(root)
+        _logger.info("***********************")
         root_tag = root.tag.replace('Comprobante', '')
         # Emisor
         emisor = ''

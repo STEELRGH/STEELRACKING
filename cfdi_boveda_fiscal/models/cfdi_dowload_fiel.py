@@ -14,7 +14,7 @@ class CfdiDownloadFiel(models.Model):
     key_name = fields.Char(string="Llave")
     key_file = fields.Binary(string='Archivo (.key)', required=True)
     password = fields.Char(string='Contraseña', required=True)
-    company_id = fields.Many2one("res.company", string="Compañia", default=lambda self: self.env.company, copy=True)
+    company_id = fields.Many2one('res.company', default=lambda self: self.env.company.id, store=True)
 
     @api.model_create_multi
     def create(self, vals_list):
