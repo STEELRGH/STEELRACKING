@@ -94,9 +94,6 @@ class RequestWizard(models.TransientModel):
                 'request_type': self.request_type,
                 'company_id': 1,
             }
-            _logger.info("111111111111111111111111111111")
-            _logger.info(vals)
-            _logger.info("111111111111111111111111111111")
             request_id = self.env['cfdi.download.request'].create(vals)     
             #
             time.sleep(3)
@@ -137,7 +134,6 @@ class RequestWizard(models.TransientModel):
 
     def action_download_request(self):
         # Se buscan paquetes de la solicitud de descarga
-        _logger.info("*********************** action_download_request")
         pack_ids = self.env['cfdi.download.pack'].search([('request_id', '=', self.request_id.id)])
         # Si el estatus de la solicitud es 3 y no tiene paquetes desacargados se procede a la descarga
         if self.request_id.estado_solicitud_type in ['3'] and not pack_ids:
@@ -186,9 +182,6 @@ class RequestWizard(models.TransientModel):
         if not xml:
             return False
         root = ET.fromstring(xml)
-        _logger.info("***********************")
-        _logger.info(root)
-        _logger.info("***********************")
         root_tag = root.tag.replace('Comprobante', '')
         # Emisor
         emisor = ''

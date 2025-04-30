@@ -4,6 +4,7 @@ from zipfile import ZipFile
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 import logging
+import xml.etree.ElementTree as ET
 _logger = logging.getLogger(__name__)
 
 class CfdiDownloadData(models.Model):
@@ -58,6 +59,7 @@ class CfdiDownloadData(models.Model):
             # Procesar los conceptos
             try:
                 conceptos = eval(rec.conceptos)
+                #comprobante = eval(rec.Comprobante)
             except Exception:
                 raise UserError("Error al evaluar los conceptos del XML.")
 
@@ -130,7 +132,7 @@ class CfdiDownloadData(models.Model):
                     'name': c.get('Descripcion'),
                     'tax_ids': tax_ids if tax_ids else False
                 }
-                self.env['account.move.line'].with_context(check_move_validity=False).create(debit_line)
+                self.env['account.move.line'].with_context(check_move_validity=True).create(debit_line)
 
                 credit_line = {
                     'move_id': invoice_id.id,
@@ -139,18 +141,18 @@ class CfdiDownloadData(models.Model):
                     'credit': total_concepto,
                     'tax_ids': tax_ids if tax_ids else False
                 }
-                self.env['account.move.line'].with_context(check_move_validity=False).create(credit_line)
-
+                #self.env['account.move.line'].with_context(check_move_validity=True).create(credit_line)
+            xml_file = False
             # Adjuntar XML al registro de factura
             if rec.pack_id.id_paquete:
                 zip_path = f'./{rec.pack_id.id_paquete}'
                 with open(zip_path, "wb") as zip_file:
                     zip_file.write(b64decode(rec.pack_id.paquete_b64))
-
                 with ZipFile(zip_path) as zf:
                     for file in zf.namelist():
                         if file.endswith('.xml') and file == rec.filename:
                             with zf.open(file) as f:
+                                xml_file = f.read()
                                 self.env['ir.attachment'].create({
                                     'name': file,
                                     'type': 'binary',
@@ -162,4 +164,38 @@ class CfdiDownloadData(models.Model):
                             break
 
             rec.invoice_id = invoice_id.id
+            
+            lines_to_process = rec.invoice_id.invoice_line_ids.filtered(lambda l: l.name != "16%")
+            stored_taxes = {line.id: line.tax_ids.ids for line in lines_to_process}
+            
+            if xml_file:
+                xml_text = str(xml_file)
+                xml_clean = xml_text.lstrip("b'").rstrip("'").replace("\\n", "\n").replace("\\xef\\xbb\\xbf", "")
+                root = ET.fromstring(xml_clean)
+                moneda = root.get("Moneda")
+                currency_id = self.env['res.currency'].search([('name', '=', moneda)], limit=1)
+                rec.invoice_id.write({'currency_id': currency_id.id})
+            
+            for line_inv in rec.invoice_id.invoice_line_ids:
+                if line_inv.name == "16%":
+                    line_inv.sudo().unlink()
+
+            # Eliminar las líneas de impuesto del 16%
+            for line_inv in rec.invoice_id.invoice_line_ids:
+                if line_inv.name == "16%":
+                    line_inv.sudo().unlink()
+            
+            # Quitar temporalmente los impuestos de las otras líneas
+            for line in lines_to_process:
+                line.write({'tax_ids': [(5, 0, 0)]})  # Elimina todos los impuestos
+            
+            # Aquí puedes hacer otras operaciones necesarias...
+            self.env.cr.savepoint()
+            # Restaurar los impuestos originales
+            for line in lines_to_process:
+                if stored_taxes.get(line.id):
+                    line.write({'tax_ids': [(6, 0, stored_taxes[line.id])]})
+            
+            rec.invoice_id._compute_amount()
+                
         return True
