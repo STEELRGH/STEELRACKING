@@ -23,6 +23,7 @@ class CfdiDownloadData(models.Model):
     serie = fields.Char(string="Serie")
     folio = fields.Char(string="Folio")
     total = fields.Char(string="Total", required=True)
+    formapago = fields.Char(string="Forma de pago", index=True)
     conceptos = fields.Text(string="Conceptos")
     invoice_id = fields.Many2one(comodel_name='account.move', string="Factura")
     invoice_payment_state = fields.Selection(related='invoice_id.payment_state')
@@ -65,10 +66,15 @@ class CfdiDownloadData(models.Model):
 
             for c in conceptos:
                 traslados = c.get('Traslados', [])
+                #_logger.info("========comprobante")
+                #_logger.info(comprobante)
+                #currency_id = self.env['res.currency'].search([('name', '=', comprobante.get('Moneda'))], limit=1)
                 tax_ids = []
                 total_concepto = 0.0
 
                 for traslado in traslados:
+                    _logger.info("===================>")
+                    _logger.info(c.get('Descripcion'))
                     base = traslado.get('Base', '0')
                     importe = traslado.get('Importe', '0')
                     tasa_o_cuota = traslado.get('TasaOCuota', '0') or '0'  # Evita valores None o vacíos
@@ -156,13 +162,15 @@ class CfdiDownloadData(models.Model):
                                 self.env['ir.attachment'].create({
                                     'name': file,
                                     'type': 'binary',
-                                    'datas': b64encode(f.read()),
+                                    'datas': b64encode(xml_file),
                                     'res_model': 'account.move',
                                     'res_id': invoice_id.id,
                                     'mimetype': 'application/xml'
                                 })
                             break
 
+            _logger.info("xml_file")
+            _logger.info(xml_file)
             rec.invoice_id = invoice_id.id
             
             lines_to_process = rec.invoice_id.invoice_line_ids.filtered(lambda l: l.name != "16%")

@@ -29,6 +29,7 @@
                     <field name="serie"/>
                     <field name="folio"/>
                     <field name="total"/>
+                    <field name="formapago"/>
                     <field name="conceptos" optional="hide"/>
                     <field name="invoice_id"/>
                     <field name="invoice_payment_state"/>

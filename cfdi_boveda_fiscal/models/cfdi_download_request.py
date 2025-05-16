@@ -116,6 +116,12 @@ class CfdiDownloadRequest(models.Model):
                 xmls = pack_id.generate_xml_vals()
                 for xml in xmls:
                     # Se busca el uuid
+                    forma_pagostr = xml.get('FormaPago')
+                    forma_pago = self.env['l10n_mx_edi.payment.method'].search([('code','=',forma_pagostr)])
+                    if forma_pago:
+                        forma_pago = forma_pago.name
+                    else:
+                        forma_pago = ""
                     xml_id = cfdi_obj.search([('uuid', '=', xml.get('uuid'))])
                     if not xml_id:
                         vals = {
@@ -130,6 +136,7 @@ class CfdiDownloadRequest(models.Model):
                             'serie': xml.get('Serie'),
                             'folio': xml.get('Folio'),
                             'total': xml.get('Total'),
+                            'formapago': forma_pago,
                             'conceptos': xml.get('Conceptos'),
                             'company_id': self.env.company.id,
                         }

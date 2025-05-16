@@ -75,6 +75,8 @@ class CfdiDownloadPack(models.Model):
                     continue
                 with zf.open(file) as f:
                     vals = self.env['request.wizard']._parse_xml_cfdi(f.read())  
+                    _logger.info("*******************")
+                    _logger.info(vals)
                     company = self.env['res.company'].search([('vat','=',vals.get('receptor'))])  
                     if vals:                         
                         val = {                           
