@@ -1,4 +1,15 @@
-from odoo import api, fields, models, Command, _
+import datetime
+import logging
+import re
+from itertools import islice
+from urllib.parse import quote, urlencode
+
+import requests
+from dateutil.relativedelta import relativedelta
+from lxml import etree
+from pytz import timezone
+
+from odoo import api, fields, models
 
 class ResCompany(models.Model):
     _inherit = 'res.company'
