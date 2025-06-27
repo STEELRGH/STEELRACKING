@@ -14,7 +14,7 @@ class CfdiDownloadData(models.Model):
 
     request_id = fields.Many2one(comodel_name='cfdi.download.request', string="Solicitud", required=True, ondelete='cascade')
     pack_id = fields.Many2one(comodel_name='cfdi.download.pack', string="Paquete", required=True, ondelete='cascade')
-    uuid = fields.Char(string="UUID", required=False)    
+    uuid = fields.Char(string="UUID", required=True)    
     filename = fields.Char(string="Archivo XML", required=True)    
     emisor = fields.Char(string="RFC emisor", required=True)
     rs_emisor = fields.Char(string="Razón social emisor", required=True)

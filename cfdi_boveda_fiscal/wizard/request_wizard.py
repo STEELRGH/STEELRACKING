@@ -4,7 +4,8 @@ from datetime import datetime
 
 from cfdiclient import Fiel
 from cfdiclient import Autenticacion
-from cfdiclient import SolicitaDescarga
+from cfdiclient import solicitadescargaEmitidos
+from cfdiclient import solicitadescargaRecibidos
 from cfdiclient import VerificaSolicitudDescarga
 from cfdiclient import DescargaMasiva
 import time
@@ -70,12 +71,18 @@ class RequestWizard(models.TransientModel):
             auth = Autenticacion(fiel)
             token = auth.obtener_token()
             # Solicitar
-            descarga = SolicitaDescarga(fiel)
+            descarga = solicitadescargaRecibidos.SolicitaDescargaRecibidos(fiel)
             fecha_inicial = datetime(self.fecha_inicial.year, self.fecha_inicial.month, self.fecha_inicial.day)
             fecha_final = datetime(self.fecha_final.year, self.fecha_final.month, self.fecha_final.day)
             #
             if self.request_type == 'recibidos':
-                result = descarga.solicitar_descarga(token, self.fiel_id.rfc, fecha_inicial, fecha_final, rfc_receptor=self.fiel_id.rfc)
+                result = descarga.solicitar_descarga(token, self.fiel_id.rfc, fecha_inicial, fecha_final, rfc_receptor=self.fiel_id.rfc,tipo_solicitud='CFDI', estado_comprobante='Vigente',)
+                token = auth.obtener_token()
+                print('TOKEN: ', token)
+                verificacion = VerificaSolicitudDescarga(fiel)
+                verificacion = verificacion.verificar_descarga(
+                    token, self.fiel_id.rfc, result['id_solicitud'])
+                _logger.info(verificacion)
             elif self.request_type == 'emitidos':
                 result = descarga.solicitar_descarga(token, self.fiel_id.rfc, fecha_inicial, fecha_final, rfc_emisor=self.fiel_id.rfc)
             else:
@@ -120,8 +127,11 @@ class RequestWizard(models.TransientModel):
                 auth = Autenticacion(fiel)
                 token = auth.obtener_token()
                 # Verificar descarga
-                v_descarga = VerificaSolicitudDescarga(fiel)                
+                v_descarga = VerificaSolicitudDescarga(fiel)
                 result = v_descarga.verificar_descarga(token, self.request_id.rfc_solicitante, self.request_id.id_solicitud)
+                _logger.info("********222222222222")
+                _logger.info(result)
+                _logger.info("********222222222222")
                 self.request_id.cod_estatus_ver = result.get('cod_estatus')
                 self.request_id.mensaje_ver = result.get('mensaje')
                 self.request_id.estado_solicitud = result.get('estado_solicitud')
