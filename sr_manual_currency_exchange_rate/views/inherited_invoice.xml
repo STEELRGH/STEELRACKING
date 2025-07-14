@@ -9,9 +9,9 @@
                 <field name="invoice_date" position="after">
                     <field name="active_manual_currency_rate" invisible="1"/>
                     <!--                    <field name="apply_manual_currency_exchange" attrs="{'invisible': [('active_manual_currency_rate', '=', False)]}"/>-->
-                    <field name="apply_manual_currency_exchange" invisible="active_manual_currency_rate == False"/>
+                    <field name="apply_manual_currency_exchange" invisible="active_manual_currency_rate == False or (move_type != 'in_invoice' and  move_type != 'in_refund')"/>
                     <!--                    <field name="manual_currency_exchange_rate" attrs="{'invisible': ['|',('apply_manual_currency_exchange', '=', False),('active_manual_currency_rate', '=', False)],'required':[('apply_manual_currency_exchange', '=', True)]}"/>-->
-                    <field name="manual_currency_exchange_rate" invisible="apply_manual_currency_exchange == False or active_manual_currency_rate == False" required="apply_manual_currency_exchange == True"/>
+                    <field name="manual_currency_exchange_rate" invisible="apply_manual_currency_exchange == False or active_manual_currency_rate == False or (move_type != 'in_invoice' and move_type != 'in_refund')" required="apply_manual_currency_exchange == True"/>
                 </field>
             </field>
         </record>

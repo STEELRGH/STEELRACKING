@@ -10,7 +10,8 @@
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
-
+import logging
+_logger = logging.getLogger(__name__)
 
 class srAccountPaymentRegister(models.TransientModel):
     _inherit = 'account.payment.register'
@@ -106,6 +107,15 @@ class srAccountPaymentRegister(models.TransientModel):
 
 
     def _create_payments(self):
+        _logger.info("================================")
+        _logger.info(self)
+        _logger.info(self.currency_id)
+        inverse_value = 0
+        if self.currency_id != 33 and self.apply_manual_currency_exchange:
+            if self.currency_id.rate_ids:
+                inverse_value = self.currency_id.rate_ids[0].inverse_company_rate
+                self.currency_id.rate_ids[0].inverse_company_rate = self.manual_currency_exchange_rate
+        _logger.info("================================")
         self.ensure_one()
         batches = self._get_batches()
         edit_mode = self.can_edit_wizard and (len(batches[0]['lines']) == 1 or self.group_payment)
@@ -172,17 +182,26 @@ class srAccountPaymentRegister(models.TransientModel):
         payments.action_post()
 
         domain = [('account_type', 'in', ('receivable', 'payable')), ('reconciled', '=', False)]
+        _logger.info("domain")
+        _logger.info(domain)
+        _logger.info(payments)
+        _logger.info(to_reconcile)
         for payment, lines in zip(payments, to_reconcile):
-
+            _logger.info("ENTRAMOS")
             # When using the payment tokens, the payment could not be posted at this point (e.g. the transaction failed)
             # and then, we can't perform the reconciliation.
             if payment.state != 'posted':
                 continue
 
-            payment_lines = payment.line_ids.filtered_domain(domain)
+            payment_lines = payment.line_ids
             for account in payment_lines.account_id:
                 (payment_lines + lines)\
                     .filtered_domain([('account_id', '=', account.id), ('reconciled', '=', False)])\
                     .reconcile()
 
+        if inverse_value > 0:
+            if self.currency_id.rate_ids:
+                self.currency_id.rate_ids[0].inverse_company_rate = inverse_value
+        _logger.info("================================")
+        
         return payments
