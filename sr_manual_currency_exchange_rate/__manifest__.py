@@ -49,7 +49,7 @@
         'views/inherited_invoice.xml',
         'views/inherited_purchase_order.xml',
         'views/inherited_sale_order.xml',
-        #'wizards/inherited_account_payment_register_view.xml',
+        'wizards/inherited_account_payment_register_view.xml',
     ],
     'demo': [],
     "external_dependencies": {},
