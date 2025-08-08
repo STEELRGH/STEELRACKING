@@ -110,11 +110,22 @@ class srAccountPaymentRegister(models.TransientModel):
         _logger.info("================================")
         _logger.info(self)
         _logger.info(self.currency_id)
+        move_currency_id = self.env['account.move'].search([('name','=', self.communication)])
         inverse_value = 0
-        if self.currency_id != 33 and self.apply_manual_currency_exchange:
+        if self.currency_id.id != 33 and self.apply_manual_currency_exchange:
             if self.currency_id.rate_ids:
                 inverse_value = self.currency_id.rate_ids[0].inverse_company_rate
                 self.currency_id.rate_ids[0].inverse_company_rate = self.manual_currency_exchange_rate
+        #else:
+        #    if move_currency_id:
+        #        _logger.info("==================== move_currency")
+        #        if move_currency_id.currency_id.rate_ids:
+        #            inverse_value = move_currency_id.currency_id.rate_ids[0].inverse_company_rate
+        #            move_currency_id.currency_id.rate_ids[0].inverse_company_rate = #self.manual_currency_exchange_rate 
+        #            _logger.info(inverse_value)
+        #            _logger.info(move_currency_id)
+        #            _logger.info(self.manual_currency_exchange_rate)
+        #        _logger.info("==================== end move_currency")
         _logger.info("================================")
         self.ensure_one()
         batches = self._get_batches()
@@ -198,10 +209,15 @@ class srAccountPaymentRegister(models.TransientModel):
                 (payment_lines + lines)\
                     .filtered_domain([('account_id', '=', account.id), ('reconciled', '=', False)])\
                     .reconcile()
-
-        if inverse_value > 0:
+        _logger.info("222222222222222")
+        _logger.info(self.currency_id)
+        _logger.info("222222222222222")
+        if inverse_value and self.currency_id.id != 33 and self.apply_manual_currency_exchange:
             if self.currency_id.rate_ids:
                 self.currency_id.rate_ids[0].inverse_company_rate = inverse_value
+        else:
+            if move_currency_id.currency_id.rate_ids:
+                move_currency_id.currency_id.rate_ids[0].inverse_company_rate = inverse_value
         _logger.info("================================")
         
         return payments
