@@ -116,12 +116,12 @@ class srAccountPaymentRegister(models.TransientModel):
             if self.currency_id.rate_ids:
                 inverse_value = self.currency_id.rate_ids[0].inverse_company_rate
                 self.currency_id.rate_ids[0].inverse_company_rate = self.manual_currency_exchange_rate
-        #else:
-        #    if move_currency_id:
+        else:
+            if move_currency_id:
         #        _logger.info("==================== move_currency")
-        #        if move_currency_id.currency_id.rate_ids:
-        #            inverse_value = move_currency_id.currency_id.rate_ids[0].inverse_company_rate
-        #            move_currency_id.currency_id.rate_ids[0].inverse_company_rate = #self.manual_currency_exchange_rate 
+                if move_currency_id.currency_id.rate_ids:
+                    inverse_value = move_currency_id.currency_id.rate_ids[0].inverse_company_rate
+                    move_currency_id.currency_id.rate_ids[0].inverse_company_rate = #self.manual_currency_exchange_rate 
         #            _logger.info(inverse_value)
         #            _logger.info(move_currency_id)
         #            _logger.info(self.manual_currency_exchange_rate)
