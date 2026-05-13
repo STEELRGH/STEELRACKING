@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_product_config_log_user,product.config.log.user,model_product_config_log,base.group_user,1,0,1,0

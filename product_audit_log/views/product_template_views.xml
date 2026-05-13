@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="product_template_form_view_inherit_audit" model="ir.ui.view">
+        <field name="name">product.template.form.inherit.audit</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="account.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='invoicing']" position="after">
+                <page string="Bitácora de Cambios" name="audit_log">
+                    <field name="log_ids" readonly="1">
+                        <tree string="Historial" create="0" edit="0" delete="0">
+                            <field name="date" string="Fecha"/>
+                            <field name="user_id" string="Usuario"/>
+                            <field name="modification" string="Modificación (con los datos)"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
