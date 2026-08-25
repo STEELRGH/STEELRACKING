@@ -38,3 +38,18 @@ class ResCompany(models.Model):
                 record.currency_next_execution_date = datetime.date.today()
                 to_update += record
             to_update.with_context(suppress_errors=True).update_currency_rates()
+
+class AccountMove(models.Model):
+    _inherit = 'account.move'
+
+    def _get_tax_totals(self, partner, tax_lines, amount_total, amount_untaxed, currency):
+        res = super()._get_tax_totals(partner, tax_lines, amount_total, amount_untaxed, currency)
+        
+        # Forzar a que cada grupo conserve los montos independientes 
+        # sin ocultar las retenciones o importes compensados
+        for subtotal_key, groups in res.get('groups_by_subtotal', {}).items():
+            for group in groups:
+                # Evita que se sobreescriba el nombre del grupo si la suma neta da 0
+                group['hide_base_amount'] = False
+                
+        return res
